@@ -130,6 +130,26 @@ select
           where fiscal_year="2020"
           group by Quarters
           order by Total_sold_Quantity desc;
+
+
+/*9. Which channel helped to bring more gross sales in the fiscal year 2021
+and the percentage of contribution? The final output contains these fields,
+channel
+gross_sales_mln
+percentage*/
+
+
+with x as
+	(select c.channel, round(sum((g.gross_price*s.sold_quantity))/1000000,2) as Gross_price_mln
+    from fact_sales_monthly s 
+    join fact_gross_price g 
+    on s.product_code=g.product_code
+    join dim_customer c 
+    on c.customer_code = s.customer_code 
+    group by c.channel)
+	select channel,Gross_price_mln,round((Gross_price_mln*100)/sum(Gross_price_mln) over(),2) as Percentage
+    from x
+    order by Percentage desc;
           
 /*10. Get the Top 3 products in each division that have a high
 total_sold_quantity in the fiscal_year 2021? The final output contains these
